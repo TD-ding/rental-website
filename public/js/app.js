@@ -83,11 +83,24 @@ function getSearchParams() {
   const min = $('#s-min').value;
   const max = $('#s-max').value;
   const layout = $('#s-layout').value;
+  const sort = $('#s-sort') ? $('#s-sort').value : '';
   if (keyword) params.set('keyword', keyword);
   if (min && Number(min) >= 0) params.set('minPrice', min);
   if (max && Number(max) >= 0) params.set('maxPrice', max);
   if (layout) params.set('layout', layout);
+  if (sort && sort !== 'newest') params.set('sort', sort);
   return params.toString();
+}
+
+// ========== 收藏功能 ==========
+function getFavs() { try { return JSON.parse(localStorage.getItem('favs') || '[]'); } catch { return []; } }
+function saveFavs(list) { localStorage.setItem('favs', JSON.stringify(list)); }
+function isFav(id) { return getFavs().includes(id); }
+function toggleFav(id) {
+  let favs = getFavs();
+  if (favs.includes(id)) { favs = favs.filter(f => f !== id); } else { favs.push(id); }
+  saveFavs(favs);
+  return favs.includes(id);
 }
 
 async function loadHouses() {
@@ -109,6 +122,7 @@ async function loadHouses() {
 
       houseList.innerHTML = houses.map(h => `
         <div class="house-card">
+          <button class="card-fav-btn ${isFav(h.id)?'active':''}" onclick="handleFav(${h.id},this)">♡</button>
           <div class="card-body">
             <h3>${esc(h.title)}</h3>
             <div class="card-meta">
@@ -300,8 +314,8 @@ function initAdmin() {
   });
 
   loadAdminHouses();
-  loadAppointments();
-  loadUsers();
+  loadAppointmentsAndStats();
+  loadUsersAndStats();
 
   $('#logout-btn').addEventListener('click', async e => {
     e.preventDefault();
@@ -406,7 +420,12 @@ async function loadAdminHouses() {
   }
 }
 
-async function editHouse(id) {
+let _adminHouses = [];
+async function loadAdminHouses() {
+  try {
+    const houses = await fetchJSON('/api/houses');
+    _adminHouses = houses;
+    const tbody = $('#houses-table tbody');
   try {
     const h = await fetchJSON(`/api/houses/${id}`);
     $('#h-id').value = h.id;
@@ -445,6 +464,10 @@ async function deleteHouse(id) {
 }
 
 async function loadAppointments() {
+  return loadAppointmentsAndStats();
+}
+
+async function loadAppointmentsAndStats() {
   try {
     const list = await fetchJSON('/api/appointments/admin');
     const tbody = $('#appointments-table tbody');
@@ -481,6 +504,10 @@ async function updateAppointment(id, status) {
 }
 
 async function loadUsers() {
+  return loadUsersAndStats();
+}
+
+async function loadUsersAndStats() {
   try {
     const users = await fetchJSON('/api/users');
     const tbody = $('#users-table tbody');
@@ -505,4 +532,85 @@ function handleAdminError(e) {
   } else {
     toast(e.message, 'error');
   }
+}
+
+// ========== 收藏交互 ==========
+
+function handleFav(id, btn) {
+  const nowFav = toggleFav(id);
+  btn.classList.toggle('active', nowFav);
+  updateFavCount();
+}
+
+function updateFavCount() {
+  const el = $('#fav-count');
+  if (el) el.textContent = getFavs().length;
+}
+
+// 收藏面板
+const favLink = $('#fav-link');
+const favPanel = $('#fav-panel');
+const favClose = $('#fav-close');
+if (favLink) {
+  updateFavCount();
+  favLink.addEventListener('click', e => { e.preventDefault(); favPanel.style.display = favPanel.style.display === 'none' ? 'block' : 'none'; if (favPanel.style.display === 'block') loadFavList(); });
+  favClose.addEventListener('click', () => { favPanel.style.display = 'none'; });
+}
+
+async function loadFavList() {
+  const favs = getFavs();
+  const favList = $('#fav-list');
+  const favEmpty = $('#fav-empty');
+  if (!favs.length) { favList.innerHTML = ''; favEmpty.style.display = 'block'; return; }
+  favEmpty.style.display = 'none';
+  try {
+    const all = await fetchJSON('/api/houses');
+    const favHouses = all.filter(h => favs.includes(h.id));
+    favList.innerHTML = favHouses.map(h => `
+      <div class="house-card">
+        <div class="card-body">
+          <h3>${esc(h.title)}</h3>
+          <div class="card-meta"><span class="price">${Number(h.price).toLocaleString()} 元/月</span><span>${esc(h.layout)}</span><span class="area">${h.area}㎡</span></div>
+          <div class="card-addr">📍 ${esc(h.address)}</div>
+        </div>
+        <div class="card-footer">
+          <a href="detail.html?id=${h.id}" class="btn btn-primary btn-sm">查看详情</a>
+          <button class="btn btn-sm btn-danger" onclick="removeFav(${h.id})">取消收藏</button>
+        </div>
+      </div>
+    `).join('');
+  } catch (_) {}
+}
+
+function removeFav(id) {
+  let favs = getFavs().filter(f => f !== id);
+  saveFavs(favs);
+  updateFavCount();
+  loadFavList();
+}
+
+// 详情页收藏按钮
+const detailFavBtn = $('#detail-fav-btn');
+if (detailFavBtn) {
+  const id = Number(new URLSearchParams(location.search).get('id'));
+  if (id) {
+    detailFavBtn.style.display = 'inline-flex';
+    const updateBtn = () => {
+      const fav = isFav(id);
+      detailFavBtn.querySelector('.fav-icon').textContent = fav ? '♥' : '♡';
+      detailFavBtn.querySelector('.fav-text').textContent = fav ? '已收藏' : '收藏';
+      detailFavBtn.classList.toggle('active', fav);
+    };
+    updateBtn();
+    detailFavBtn.addEventListener('click', () => { toggleFav(id); updateBtn(); });
+  }
+}
+
+// ========== 管理后台统计 ==========
+
+function updateAdminStats(houses, appointments, users) {
+  const sh = $('#stat-houses'); if (sh) sh.textContent = houses.length;
+  const sp = $('#stat-pending'); if (sp) sp.textContent = appointments.filter(a => a.status === 'pending').length;
+  const sc = $('#stat-confirmed'); if (sc) sc.textContent = appointments.filter(a => a.status === 'confirmed').length;
+  const su = $('#stat-users'); if (su) su.textContent = users.length;
 }

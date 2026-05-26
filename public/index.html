@@ -12,6 +12,7 @@
       <a href="index.html" class="logo">🏠 好租</a>
       <div class="nav-links">
         <a href="index.html">首页</a>
+        <a href="#" id="fav-link">我的收藏</a>
         <a href="login.html">管理登录</a>
       </div>
     </div>
@@ -49,14 +50,14 @@
         <input type="number" id="s-max" placeholder="最高价格" min="0">
         <select id="s-layout">
           <option value="">全部户型</option>
-          <option>开间</option>
-          <option>1室0厅</option>
-          <option>1室1厅</option>
-          <option>2室1厅</option>
-          <option>2室2厅</option>
-          <option>3室1厅</option>
-          <option>3室2厅</option>
-          <option>4室2厅</option>
+          <option>开间</option><option>1室0厅</option><option>1室1厅</option>
+          <option>2室1厅</option><option>2室2厅</option><option>3室1厅</option>
+          <option>3室2厅</option><option>4室2厅</option>
+        </select>
+        <select id="s-sort">
+          <option value="newest">最新发布</option>
+          <option value="price_asc">价格从低到高</option>
+          <option value="price_desc">价格从高到低</option>
         </select>
         <button type="submit" class="btn btn-primary">搜索</button>
       </form>
@@ -73,6 +74,17 @@
       <p>😔 没有找到匹配的房源，试试调整搜索条件</p>
     </div>
   </main>
+
+  <div id="fav-panel" class="fav-panel" style="display:none;">
+    <div class="fav-panel-header">
+      <h3>我的收藏 <span id="fav-count" class="badge">0</span></h3>
+      <button class="btn btn-sm btn-secondary" id="fav-close">收起</button>
+    </div>
+    <div id="fav-list" class="house-grid"></div>
+    <div id="fav-empty" class="empty-state" style="display:none;">
+      <p>还没有收藏房源，点击房源卡片上的 ♡ 添加收藏</p>
+    </div>
+  </div>
 
   <footer class="footer">
     <div class="container">

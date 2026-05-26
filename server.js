@@ -116,7 +116,10 @@ app.get('/api/houses', (req, res) => {
       params.push(layout);
     }
 
-    sql += ' ORDER BY created_at DESC';
+    const sortMap = { price_asc: 'price ASC', price_desc: 'price DESC', newest: 'created_at DESC' };
+    const sort = sortMap[req.query.sort] || 'created_at DESC';
+    sql += ` ORDER BY ${sort}`;
+
     const houses = db.prepare(sql).all(...params);
     res.json(houses);
   } catch (e) {
