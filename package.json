@@ -1,0 +1,14 @@
+{
+  "name": "rental-website",
+  "version": "1.0.0",
+  "description": "租房网站",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "bcryptjs": "^2.4.3",
+    "express": "^4.21.0"
+  }
+}
