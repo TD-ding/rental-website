@@ -156,6 +156,22 @@ a:hover { text-decoration: underline; }
 .toast.error { background: #ef4444; }
 @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
+/* Favorites */
+.btn-fav { color: #ef4444; border: 1px solid #ef4444; background: transparent; }
+.btn-fav.active { background: #fef2f2; }
+.detail-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.fav-panel { background: #fff; border-top: 2px solid #2563eb; padding: 24px 20px; }
+.fav-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.card-fav-btn { position: absolute; bottom: 16px; left: 18px; background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #ccc; transition: 0.2s; padding: 0; }
+.card-fav-btn:hover, .card-fav-btn.active { color: #ef4444; }
+.house-card { position: relative; }
+
+/* Admin Stats */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: #fff; border-radius: 10px; padding: 16px 20px; border: 1px solid #e5e7eb; text-align: center; }
+.stat-card-num { font-size: 1.8rem; font-weight: 700; color: #2563eb; }
+.stat-card-label { font-size: 0.85rem; color: #888; margin-top: 2px; }
+
 /* Responsive */
 @media (max-width: 640px) {
   .hero h1 { font-size: 1.5rem; }
