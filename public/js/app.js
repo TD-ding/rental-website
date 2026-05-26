@@ -74,7 +74,7 @@ async function loadHeroCount() {
     const houses = await fetchJSON('/api/houses');
     const el = $('#hero-count');
     if (el) el.textContent = houses.length;
-  } catch (_) {}
+  } catch (_e) { /* ignore */ }
 }
 
 function getSearchParams() {
@@ -319,7 +319,7 @@ function initAdmin() {
 
   $('#logout-btn').addEventListener('click', async e => {
     e.preventDefault();
-    try { await fetchJSON('/api/logout', { method: 'POST' }); } catch (_) {}
+    try { await fetchJSON('/api/logout', { method: 'POST' }); } catch (_e) { /* ignore */ }
     location.href = 'login.html';
   });
 
@@ -426,6 +426,25 @@ async function loadAdminHouses() {
     const houses = await fetchJSON('/api/houses');
     _adminHouses = houses;
     const tbody = $('#houses-table tbody');
+    tbody.innerHTML = houses.map(h => `
+      <tr>
+        <td>${h.id}</td>
+        <td>${esc(h.title)}</td>
+        <td>${Number(h.price).toLocaleString()} 元</td>
+        <td>${esc(h.layout)}</td>
+        <td>${h.area}㎡</td>
+        <td class="actions">
+          <button class="btn btn-sm btn-secondary" onclick="editHouse(${h.id})">编辑</button>
+          <button class="btn btn-danger" onclick="deleteHouse(${h.id})">删除</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    handleAdminError(e);
+  }
+}
+
+async function editHouse(id) {
   try {
     const h = await fetchJSON(`/api/houses/${id}`);
     $('#h-id').value = h.id;
@@ -579,11 +598,11 @@ async function loadFavList() {
         </div>
       </div>
     `).join('');
-  } catch (_) {}
+  } catch (_e) { /* ignore */ }
 }
 
 function removeFav(id) {
-  let favs = getFavs().filter(f => f !== id);
+  const favs = getFavs().filter(f => f !== id);
   saveFavs(favs);
   updateFavCount();
   loadFavList();

@@ -314,6 +314,10 @@ app.get('/api/users', (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`租房网站已启动: http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`租房网站已启动: http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
