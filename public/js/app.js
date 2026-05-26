@@ -56,14 +56,25 @@ function removeFieldError(input) {
 
 const houseList = $('#house-list');
 const searchForm = $('#search-form');
+let isSearch = false;
 
 if (houseList) {
+  loadHeroCount();
   loadHouses();
 
   searchForm.addEventListener('submit', e => {
     e.preventDefault();
+    isSearch = true;
     loadHouses();
   });
+}
+
+async function loadHeroCount() {
+  try {
+    const houses = await fetchJSON('/api/houses');
+    const el = $('#hero-count');
+    if (el) el.textContent = houses.length;
+  } catch (_) {}
 }
 
 function getSearchParams() {
@@ -93,26 +104,32 @@ async function loadHouses() {
     if (houses.length === 0) {
       houseList.innerHTML = '';
       if (emptyEl) emptyEl.style.display = 'block';
-      return;
-    }
-    if (emptyEl) emptyEl.style.display = 'none';
+    } else {
+      if (emptyEl) emptyEl.style.display = 'none';
 
-    houseList.innerHTML = houses.map(h => `
-      <div class="house-card">
-        <div class="card-body">
-          <h3>${esc(h.title)}</h3>
-          <div class="card-meta">
-            <span class="price">${Number(h.price).toLocaleString()} 元/月</span>
-            <span>${esc(h.layout)}</span>
-            <span class="area">${h.area}㎡</span>
+      houseList.innerHTML = houses.map(h => `
+        <div class="house-card">
+          <div class="card-body">
+            <h3>${esc(h.title)}</h3>
+            <div class="card-meta">
+              <span class="price">${Number(h.price).toLocaleString()} 元/月</span>
+              <span>${esc(h.layout)}</span>
+              <span class="area">${h.area}㎡</span>
+            </div>
+            <div class="card-addr">📍 ${esc(h.address)}</div>
           </div>
-          <div class="card-addr">📍 ${esc(h.address)}</div>
+          <div class="card-footer">
+            <a href="detail.html?id=${h.id}" class="btn btn-primary btn-sm">查看详情</a>
+          </div>
         </div>
-        <div class="card-footer">
-          <a href="detail.html?id=${h.id}" class="btn btn-primary btn-sm">查看详情</a>
-        </div>
-      </div>
-    `).join('');
+      `).join('');
+    }
+
+    if (isSearch) {
+      isSearch = false;
+      const target = $('#results-section');
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   } catch (e) {
     houseList.innerHTML = '';
     if (emptyEl) {
