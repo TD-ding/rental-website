@@ -41,6 +41,13 @@ db.exec(`
     created_at TEXT DEFAULT (datetime('now', 'localtime')),
     FOREIGN KEY (house_id) REFERENCES houses(id)
   );
+
+  CREATE TABLE IF NOT EXISTS sessions (
+    token TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    expires_at TEXT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
 `);
 
 function seed() {
@@ -71,6 +78,11 @@ function seed() {
   }
 }
 
+function cleanExpiredSessions() {
+  db.prepare("DELETE FROM sessions WHERE expires_at <= datetime('now')").run();
+}
+
 seed();
+cleanExpiredSessions();
 
 module.exports = db;
