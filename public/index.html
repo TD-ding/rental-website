@@ -21,10 +21,26 @@
     <div class="container">
       <h1>找到你的理想居所</h1>
       <p>海量优质房源，轻松租房</p>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-num" id="hero-count">--</span>
+          <span class="stat-label">在租房源</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">9</span>
+          <span class="stat-label">覆盖城市</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-num">0</span>
+          <span class="stat-label">中介费</span>
+        </div>
+      </div>
     </div>
   </header>
 
-  <section class="search-section">
+  <section class="search-section" id="search-section">
     <div class="container">
       <form id="search-form" class="search-bar">
         <input type="text" id="s-keyword" placeholder="搜索关键词（小区名、地址...）">
@@ -47,7 +63,7 @@
     </div>
   </section>
 
-  <main class="container">
+  <main class="container" id="results-section">
     <div class="section-header">
       <h2 id="result-title">全部房源</h2>
       <span id="result-count" class="badge"></span>

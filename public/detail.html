@@ -24,16 +24,17 @@
     </div>
 
     <section class="appointment-section">
-      <h2>预约看房</h2>
+      <h2>📅 预约看房</h2>
+      <p class="appointment-hint">感兴趣？填写下方信息，我们会尽快安排带看</p>
       <form id="appointment-form" class="form-card">
         <input type="hidden" id="a-house-id">
         <div class="form-group">
           <label>您的姓名</label>
-          <input type="text" id="a-name" required>
+          <input type="text" id="a-name" required placeholder="请输入您的姓名">
         </div>
         <div class="form-group">
           <label>联系电话</label>
-          <input type="tel" id="a-phone" required>
+          <input type="tel" id="a-phone" required placeholder="请输入11位手机号">
         </div>
         <div class="form-group">
           <label>期望看房日期</label>
@@ -41,9 +42,9 @@
         </div>
         <div class="form-group">
           <label>留言（可选）</label>
-          <textarea id="a-message" rows="3"></textarea>
+          <textarea id="a-message" rows="3" placeholder="有什么想了解的，可以写在这里"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary">提交预约</button>
+        <button type="submit" class="btn btn-primary btn-block">提交预约</button>
       </form>
     </section>
   </main>
